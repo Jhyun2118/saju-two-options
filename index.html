@@ -128,6 +128,17 @@
   .cx-colh small{display:block;font-weight:400;color:#7b8398;font-size:10.5px;margin-top:2px;}
   .cx-rowh{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-weight:800;color:#161b2c;font-size:13.5px;}
   .cx-rowh small{display:block;font-weight:400;color:#7b8398;font-size:10.5px;margin-top:2px;}
+  /* 재생성 시퀀스(옵션2, 인쇄 전용) */
+  .regen-seq{display:none;}
+  .rs-title{font-size:13px;font-weight:800;color:#fff;margin-bottom:10px;}
+  .rs-title b{color:#9db4ff;}
+  .rs-flow{display:flex;align-items:stretch;gap:7px;}
+  .rs-bub{flex:1;background:#241a4d;border:1px solid #2a2356;border-radius:10px;padding:9px 10px;font-size:11px;color:#ece8ff;line-height:1.5;}
+  .rs-step{display:block;color:#e6c46b;font-size:9.5px;font-weight:700;margin-bottom:3px;}
+  .rs-arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9a7bff;font-size:18px;font-weight:700;flex:0 0 auto;}
+  .rs-arrow small{font-size:8px;color:#a99fd6;font-weight:400;}
+  .rs-threat{margin-top:11px;background:#2c2c6a;color:#d6d6ff;border-radius:10px;padding:10px 13px;font-size:11.5px;line-height:1.6;}
+  .rs-threat b{color:#fff;}
 
   @media print{
     @page{ size:A4 landscape; margin:10mm; }
@@ -151,6 +162,7 @@
     .frame{display:none;}
     .right{width:100% !important;max-width:none !important;page-break-before:always;}
     .cells{display:block;width:100% !important;background:#f4f5fa;border:1px solid #e3e6ef;padding:14px;border-radius:14px;page-break-inside:avoid;}
+    .regen-seq{display:block;width:100%;margin-top:16px;background:#0e0b1f;border:1px solid #2a2356;border-radius:14px;padding:14px;page-break-inside:avoid;}
     .mocknote{display:block;text-align:center;font-size:12px;margin-top:10px;}
     .impact{page-break-before:always;page-break-inside:avoid;}
     .siband{page-break-inside:avoid;}
@@ -221,7 +233,7 @@
               <div class="cx-colh">보류<small>"제 영역이에요"</small></div>
               <div class="cx-colh">인정<small>"제 영역 아니에요"</small></div>
 
-              <div class="cx-rowh">잔류<small>한결 직접</small></div>
+              <div class="cx-rowh">잔류<small>한결이 그대로</small></div>
               <div class="cardx">
                 <div class="cx-msg"><span class="who">한결</span>연애는 <b>제 영역이에요</b>, 제가 바로 봐드릴게요.</div>
                 <div class="cx-msg">바로 연락하기보다, 마음이 차분해진 다음 안부로 여는 편이 잘 맞아요.</div>
@@ -332,11 +344,11 @@
           <div class="frame"><iframe src="tvt_mockup.html" title="단일진리 역설 목업" loading="lazy"></iframe></div>
           <div class="cells">
             <div class="cells-grid">
-              <div class="cx-corner">호의도 →<br>말투 ↓</div>
+              <div class="cx-corner">첫 풀이 →<br>말투 ↓</div>
               <div class="cx-colh">나쁜 운<small>안 좋은 풀이</small></div>
               <div class="cx-colh">좋은 운<small>좋은 풀이</small></div>
 
-              <div class="cx-rowh">단정적<small>"길은 하나"</small></div>
+              <div class="cx-rowh">단정적 말투<small>"길은 하나"</small></div>
               <div class="cardx">
                 <div class="cx-msg"><span class="who">사주</span>당신은 <b>조직에 매여 뜻을 펴기 어려운</b> 명입니다.</div>
                 <div class="cx-foot bad">답변 재생성 유발</div>
@@ -358,6 +370,20 @@
             </div>
           </div>
           <div class="cells-cap">★ 같은 사주. 두 축(<b>호의도 × 말투</b>)만 달라진다. '여러 갈래' 말투는 운명 하나 믿는 이에게 <b>좋은 운이어도 위협</b>이 된다.</div>
+
+          <div class="regen-seq">
+            <div class="rs-title">↻ 그리고, 같은 사용자가 <b>답변을 다시 생성할 때마다 매번 다른 운명</b>이 나온다</div>
+            <div class="rs-flow">
+              <div class="rs-bub"><span class="rs-step">첫 풀이</span>당신은 조직에 매여 뜻을 펴기 어려운 명입니다.</div>
+              <div class="rs-arrow">↻<small>재생성</small></div>
+              <div class="rs-bub"><span class="rs-step">다시 생성 1</span>당신은 독립·창업으로 크게 트이는 명입니다.</div>
+              <div class="rs-arrow">↻<small>재생성</small></div>
+              <div class="rs-bub"><span class="rs-step">다시 생성 2</span>당신은 학업·자격으로 방향을 바꿔야 하는 명입니다.</div>
+              <div class="rs-arrow">↻<small>재생성</small></div>
+              <div class="rs-bub"><span class="rs-step">다시 생성 3</span>당신은 관계 변화로 진로가 꺾이는 명입니다.</div>
+            </div>
+            <div class="rs-threat">속마음: <b>"또 다르잖아… 진짜 하나를 찾으려 돌릴수록 운명이 더 갈라진다."</b> → 운명이 하나라 믿는 사람은 재생성할수록 위협감↑ <b>(자기-패배 역설)</b>. 반대로 여러 답을 자연스럽게 받아들이는 사람은 부담 없이 고른다.</div>
+          </div>
           <div class="mocknote" style="color:#3147b0;">(이 화면은 실제로 클릭하면 움직입니다. 인터랙티브 데모는 맨 위 링크 참조)</div>
         </div>
       </div>
