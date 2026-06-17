@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MysticDay · O2 (연애 focal · 두 전문가 · 자유타이핑)</title>
+<style>
+  :root{--panel:#171234;--bubble-ai:#241a4d;--bubble-cw:#2b2150;--bubble-user:#5b4bd6;
+    --gold:#e6c46b;--green:#7fe6a8;--txt:#ece8ff;--sub:#a99fd6;--line:#2a2356;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:radial-gradient(1200px 600px at 50% -10%,#241a4d 0%,#0e0b1f 55%);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    color:var(--txt);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .lab{width:100%;max-width:440px;margin:14px auto 0;padding:10px 12px;background:#120e29;border:1px solid var(--line);border-radius:14px;font-size:12px;color:var(--sub);}
+  .lab b{color:var(--gold);}
+  .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+  .cellbtn{border:1px solid var(--line);background:#1c1640;color:var(--txt);border-radius:9px;padding:7px 9px;font-size:12px;cursor:pointer;line-height:1.2;text-align:left;flex:1;}
+  .cellbtn:hover{border-color:var(--gold);}
+  .cellbtn.active{background:var(--gold);color:#1a1330;border-color:var(--gold);font-weight:700;}
+  .cellbtn small{display:block;font-size:9.5px;opacity:.8;font-weight:400;}
+  .metrics{margin-top:9px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+  .met{background:#1c1640;border:1px solid var(--line);border-radius:9px;padding:7px;text-align:center;}
+  .met .k{font-size:9.5px;color:var(--sub);}.met .v{font-size:15px;color:var(--gold);font-weight:700;margin-top:2px;}
+  .woaline{margin-top:7px;font-size:11px;color:var(--sub);}.woaline b{color:var(--green);}
+  .tools{display:flex;gap:8px;margin-top:8px;}
+  .tools button{flex:1;border:1px solid var(--line);background:#1c1640;color:var(--sub);border-radius:9px;padding:7px;font-size:12px;cursor:pointer;}
+  .tools button:hover{color:var(--txt);border-color:var(--gold);}
+
+  .phone{width:100%;max-width:440px;height:820px;margin:12px auto 30px;background:var(--panel);border-radius:26px;border:1px solid var(--line);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+  .topbar{padding:11px 14px;display:flex;align-items:center;gap:11px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#1d1646,#171234);}
+  .ava{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:18px;background:#efe7d4;border:1px solid var(--gold);}
+  .topbar .nm{font-weight:700;font-size:14.5px;}.topbar .st{font-size:11px;color:var(--sub);}
+  .daybadge{margin-left:auto;text-align:right;}.daybadge .d{font-size:11px;color:var(--gold);font-weight:700;}.daybadge .e{font-size:10px;color:var(--sub);}
+
+  .chat{flex:1;overflow-y:auto;padding:14px 14px 6px;display:flex;flex-direction:column;gap:11px;}
+  .ep-banner{align-self:center;font-size:11px;color:var(--gold);background:#1c1640;border:1px solid var(--line);padding:5px 14px;border-radius:20px;}
+  .msg{display:flex;gap:9px;align-items:flex-end;max-width:88%;opacity:0;transform:translateY(14px);animation:rise .42s cubic-bezier(.2,.7,.3,1) forwards;}
+  @keyframes rise{to{opacity:1;transform:translateY(0);}}
+  .msg.user{align-self:flex-end;flex-direction:row-reverse;}
+  .mava{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:15px;flex:0 0 auto;background:#efe7d4;border:1px solid var(--line);}
+  .mava.user{background:radial-gradient(circle at 30% 30%,#6b5cf0,#2a1f63);}
+  .bubble{padding:11px 14px;border-radius:16px;font-size:14.5px;line-height:1.62;}
+  .ai .bubble{background:var(--bubble-ai);border-bottom-left-radius:5px;}
+  .cw .bubble{background:var(--bubble-cw);border-bottom-left-radius:5px;border:1px solid #4a3c86;}
+  .user .bubble{background:var(--bubble-user);border-bottom-right-radius:5px;}
+  .who{font-size:11px;color:var(--gold);margin:0 0 4px 2px;}.cw .who{color:#f0d488;}
+  .sys{align-self:center;font-size:11.5px;color:var(--sub);background:#120e29;border:1px solid var(--line);padding:6px 12px;border-radius:20px;opacity:0;animation:rise .4s forwards;display:flex;gap:7px;align-items:center;}
+  .dotpulse{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 1s infinite;}
+  @keyframes pulse{0%,100%{opacity:.3;}50%{opacity:1;}}
+  .typing{display:flex;gap:9px;align-items:flex-end;opacity:0;animation:rise .3s forwards;}
+  .typing .bubble{padding:13px 15px;background:var(--bubble-ai);border-bottom-left-radius:5px;}
+  .typing.cw .bubble{background:var(--bubble-cw);border:1px solid #4a3c86;}
+  .tdot{width:7px;height:7px;border-radius:50%;background:var(--sub);display:inline-block;margin:0 2px;animation:bounce 1.2s infinite;}
+  .tdot:nth-child(2){animation-delay:.18s;}.tdot:nth-child(3){animation-delay:.36s;}
+  @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4;}30%{transform:translateY(-6px);opacity:1;}}
+
+  .card{margin:4px 6px 8px;padding:13px;background:#120e29;border:1px solid var(--line);border-radius:16px;opacity:0;animation:rise .5s forwards;}
+  .card .tag{font-size:10px;letter-spacing:.5px;color:var(--gold);text-transform:uppercase;margin-bottom:6px;}
+  .card.post .tag{color:var(--green);}
+  .card p{margin:0 0 10px;font-size:13px;}
+  .card input[type=range]{width:100%;accent-color:var(--gold);}.card.post input[type=range]{accent-color:var(--green);}
+  .card .ends{display:flex;justify-content:space-between;font-size:10.5px;color:var(--sub);margin-top:5px;}
+  .card .val{text-align:center;color:var(--gold);font-size:13px;margin-top:7px;font-weight:700;}.card.post .val{color:var(--green);}
+  .card .go{margin-top:11px;width:100%;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;background:var(--gold);color:#1a1330;cursor:pointer;}.card.post .go{background:var(--green);}
+  .commit{margin-top:11px;}.commit .q{font-size:12px;color:var(--sub);margin-bottom:7px;}
+  .commit .opts{display:flex;gap:8px;}
+  .commit .opts button{flex:1;border:1px solid var(--line);background:#1c1640;color:var(--txt);border-radius:10px;padding:9px;font-size:12px;cursor:pointer;}
+  .commit .opts button.sel{background:var(--green);color:#0e2a1a;border-color:var(--green);font-weight:700;}
+  .composer{padding:9px 12px 13px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;}
+  .composer input{flex:1;background:#120e29;border:1px solid var(--line);border-radius:20px;padding:10px 14px;color:var(--txt);font-size:13.5px;outline:none;}
+  .composer input::placeholder{color:var(--sub);}.composer input:disabled{opacity:.5;}
+  .composer .send{width:38px;height:38px;border-radius:50%;background:var(--gold);color:#1a1330;border:none;font-size:17px;cursor:pointer;}
+  .composer .send:disabled{opacity:.4;cursor:default;}
+  .hint{font-size:10px;color:var(--sub);text-align:center;padding:0 0 4px;}
+  #endbar{padding:0 12px 8px;}
+  #endbar button{width:100%;border:1px solid var(--line);background:#1c1640;color:var(--sub);border-radius:12px;padding:11px;font-size:13px;cursor:pointer;}
+  #endbar button:hover{border-color:var(--gold);color:var(--txt);}
+  /* 인쇄/PDF: 애니메이션 미실행으로 투명하게 굳는 것 방지 */
+  @media print{
+    *{animation:none !important;}
+    .msg,.sys,.typing,.card,.ep-banner,.bubble{opacity:1 !important;transform:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="lab" id="lab">
+  <div class="row" style="justify-content:space-between;"><span><b>O2 · 연애 focal(오라클) + 자유대화 직업(현도)</b></span></div>
+  <div style="font-size:10.5px;color:var(--sub);margin-top:8px;">2×2 (메인·종단) · 존재-통제는 별도 단면 Study 2</div>
+  <div class="row" style="margin-top:4px;">
+    <button class="cellbtn active" data-cell="A">보류×잔류<small>제 영역이에요·한결</small></button>
+    <button class="cellbtn" data-cell="B">인정×잔류<small>제 영역 아니에요·한결=orphaned</small></button>
+  </div>
+  <div class="row" style="margin-top:6px;">
+    <button class="cellbtn" data-cell="C">보류×핸드오프<small>제 영역이지만·오라클</small></button>
+    <button class="cellbtn" data-cell="D">인정×핸드오프<small>제 영역 아니라·오라클=repair</small></button>
+  </div>
+  <div class="metrics">
+    <div class="met"><div class="k">체류시간</div><div class="v" id="mTime">0:00</div></div>
+    <div class="met"><div class="k">사용자 턴</div><div class="v" id="mTurns">0</div></div>
+    <div class="met"><div class="k">후속질문</div><div class="v" id="mFollow">0</div></div>
+  </div>
+  <div class="woaline" id="woaline">WOA(episode): 사전 - · 사후 - · 이동 - · commit -</div>
+  <div class="tools"><button id="replay">▶ 처음부터</button></div>
+</div>
+
+<div class="phone">
+  <div class="topbar">
+    <div class="ava">🍵</div>
+    <div><div class="nm">한결 <span style="font-size:11px;color:var(--sub);font-weight:400;">· 오늘의 사주</span></div><div class="st" id="status">대화 중</div></div>
+    <div class="daybadge"><div class="d">Day 3 / 5</div><div class="e">자유 대화</div></div>
+  </div>
+  <div class="chat" id="chat"></div>
+  <div class="hint" id="hint" style="display:none;">자유롭게 물어보세요. engagement로 기록됩니다 · 다 됐으면 아래 ‘오늘 상담 마치기’</div>
+  <div id="endbar" style="display:none;"><button id="endbtn">오늘 상담 마치기</button></div>
+  <div class="composer">
+    <input id="inp" placeholder="메시지 입력…">
+    <button class="send" id="send">↑</button>
+  </div>
+</div>
+
+<script>
+// ── 고정 내용 ──
+const GENERAL="오늘은 마음이 한쪽으로 쏠려 조급해지기 쉬운 날이에요. 서두르면 결이 흐트러지니, 한 박자 고르고 가면 더 좋게 풀려요.";
+const LIFE="지금 흐름을 보면, 마음이 앞서서 서두르고 싶어지는 때예요. 그 마음만 한 번 고르면, 관계든 일이든 훨씬 부드럽게 풀립니다.";
+const LOVE="지금 두 분 사이는 문이 닫힌 게 아니라 잠깐 숨을 고르는 때예요. 바로 연락하기보다, 마음이 차분해진 다음 가볍게 안부로 여는 편이 훨씬 잘 맞아요.";
+const LOVEQ="사실 헤어진 사람한테 다시 연락해볼까 고민 중이에요… 지금 연락해도 될까요?";
+const PREPROMPT="네, 같이 봐드릴게요. 그 전에, 지금 연락하는 쪽 / 좀 더 기다리는 쪽, 마음은 어디로 기울어 있으세요?";
+const USERREPLY="두어 달 됐어요.";
+const ACK="그러셨군요, 마음 많이 쓰셨겠어요.";
+// v4.1 warmth 균형: 공감·안심 비트를 *모든 셀 동일*하게, 조언 owner가 전달
+const WARM_A="연애 쪽은 제 영역이에요, 제가 바로 봐드릴게요. 재회 연락, 마음 많이 졸이셨죠. 너무 조급해 마세요. 한 가지만, 헤어진 지는 좀 되셨어요?";
+const WARM_B="연애 쪽은… 솔직히 제 영역은 아니에요. 그래도 마음 졸이고 계실 텐데, 너무 조급해 마세요. 보이는 대로 전해드릴게요. 한 가지만, 헤어진 지는 좀 되셨어요?";
+const ORAC_HI="안녕하세요, 연애의 길잡이 오라클이에요. 재회 연락, 마음 많이 졸이셨죠. 너무 조급해 마세요. 한 가지만, 헤어진 지는 좀 되셨어요?";
+const HANDBACK="네, 연애 쪽은 오라클님이 담당이라 그렇게 봐드렸어요. 그 외에 더 궁금한 건 제가 이어서 볼게요.";
+
+// 2×2: 자격(보류/인정) × 핸드오프(잔류/오라클) · 질문→답→조언 턴구조 · warmth 균형(v4.1)
+const READING={
+  // 보류(제 영역이에요) × 잔류
+  A:[{s:"main",t:LIFE},
+     {s:"main",t:WARM_A},
+     {s:"user",t:USERREPLY},
+     {s:"main",t:ACK+" "+LOVE}],
+  // 인정(제 영역 아니에요) × 잔류 = orphaned
+  B:[{s:"main",t:LIFE},
+     {s:"main",t:WARM_B},
+     {s:"user",t:USERREPLY},
+     {s:"main",t:ACK+" "+LOVE}],
+  // 보류 × 핸드오프(오라클) = teaming
+  C:[{s:"main",t:LIFE},
+     {s:"main",t:"연애 쪽은 제 영역이라 봐드려도 되는데, 마침 연애·궁합을 깊이 보는 오라클님이 계세요. 함께 들으면 더 든든하실 거예요. 잠깐 모셔올게요."},
+     {s:"sys",t:"연애·궁합 담당 · 오라클 연결 중"},
+     {s:"orac",t:ORAC_HI},
+     {s:"user",t:USERREPLY},
+     {s:"orac",t:ACK+" "+LOVE},
+     {s:"sys",t:"한결에게 다시 연결"},
+     {s:"main",t:HANDBACK}],
+  // 인정 × 핸드오프(오라클) = felicity repair
+  D:[{s:"main",t:LIFE},
+     {s:"main",t:"연애 쪽은 솔직히 제 영역은 아니에요. 이건 연애·궁합을 담당하는 오라클님이 직접 봐주시는 게 맞아요. 잠깐 모셔올게요."},
+     {s:"sys",t:"연애·궁합 담당 · 오라클 연결 중"},
+     {s:"orac",t:ORAC_HI},
+     {s:"user",t:USERREPLY},
+     {s:"orac",t:ACK+" "+LOVE},
+     {s:"sys",t:"한결에게 다시 연결"},
+     {s:"main",t:HANDBACK}],
+};
+
+// 자유대화: 두 전문가 등장(연애=오라클[핸드오프 셀], 직업=현도)
+const LOVEKEY=/연애|재회|연락|고백|헤어|짝사랑|썸|남자친구|여자친구/;
+const JOBKEY=/직업|이직|취업|적성|사업|회사|커리어|진로/;
+const FREE_MAIN=["그 마음도 충분히 그럴 수 있어요. 지금은 받기보다 고르는 시기예요.",
+  "조급함만 내려놓으면 흐름이 당신 편이에요. 천천히 가도 늦지 않아요.",
+  "좋은 질문이에요. 그 부분도 차차 풀립니다."];
+const FREE_ORAC=["연애 쪽은 제가 볼게요. 마음이 앞설수록 한 박자 늦추는 게 두 분께 좋아요.",
+  "재회는 닫힌 문이 아니에요. 다만 먼저 당신 마음을 고르는 게 순서예요."];
+const FREE_HYEON=["직업 쪽은 제가 봐드릴게요. 적성은 분명한데 타이밍이 관건이에요.",
+  "이직은 가능성 있어요. 자리를 옮기기보다 고르는 눈을 먼저 키우세요."];
+
+const chat=document.getElementById('chat'), statusEl=document.getElementById('status');
+const inp=document.getElementById('inp'), sendBtn=document.getElementById('send'), hintEl=document.getElementById('hint');
+let timers=[], current='A', preVal=null, postVal=null, commit=null;
+let userTurns=0, followups=0, secs=0, tick=null, episodeDone=false, fi=0;
+
+function clearAll(){timers.forEach(clearTimeout);timers=[];if(tick){clearInterval(tick);tick=null;}}
+function esc(x){return x.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+function avatar(s){return s==='orac'?'<div class="mava cw">🔮</div>':s==='hyeon'?'<div class="mava cw">🧭</div>':s==='main'?'<div class="mava">🍵</div>':'<div class="mava user">🙂</div>';}
+function who(s){return s==='orac'?'오라클':s==='hyeon'?'현도':s==='main'?'한결':'';}
+function fmt(t){return Math.floor(t/60)+':'+String(t%60).padStart(2,'0');}
+function metrics(){document.getElementById('mTime').textContent=fmt(secs);
+  document.getElementById('mTurns').textContent=userTurns;document.getElementById('mFollow').textContent=followups;
+  let mv='-';if(preVal!==null&&postVal!==null){const d=postVal-preVal;mv=(d>0?'+':'')+d;}
+  document.getElementById('woaline').innerHTML='WOA(episode): 사전 <b>'+(preVal??'-')+'</b> · 사후 <b>'+(postVal??'-')+'</b> · 이동 <b>'+mv+'</b> · commit <b>'+(commit||'-')+'</b>';}
+function banner(t){const e=document.createElement('div');e.className='ep-banner';e.textContent=t;chat.appendChild(e);chat.scrollTop=chat.scrollHeight;}
+function addTyping(s){const e=document.createElement('div');e.className=(s==='orac'||s==='hyeon')?'typing cw':'typing';e.id='typing';
+  e.innerHTML=avatar(s)+'<div class="bubble"><span class="tdot"></span><span class="tdot"></span><span class="tdot"></span></div>';chat.appendChild(e);chat.scrollTop=chat.scrollHeight;}
+function rmTyping(){const t=document.getElementById('typing');if(t)t.remove();}
+function addMsg(s,t){
+  if(s==='sys'){const e=document.createElement('div');e.className='sys';e.innerHTML='<span class="dotpulse"></span>'+esc(t);chat.appendChild(e);chat.scrollTop=chat.scrollHeight;return;}
+  if(s==='user'){userTurns++;if(episodeDone)followups++;metrics();}
+  const cls=s==='user'?'user':(s==='main'?'ai':'cw');
+  const w=document.createElement('div');w.className='msg '+cls;
+  const lbl=(s==='main'||s==='orac'||s==='hyeon')?'<div class="who">'+who(s)+'</div>':'';
+  w.innerHTML=avatar(s)+'<div>'+lbl+'<div class="bubble">'+esc(t)+'</div></div>';chat.appendChild(w);chat.scrollTop=chat.scrollHeight;}
+function aiSay(s,t,delay){const tt=Math.min(1700,600+t.length*10);
+  timers.push(setTimeout(()=>{statusEl.textContent=who(s)+' 입력 중…';addTyping(s);},delay));
+  timers.push(setTimeout(()=>{rmTyping();addMsg(s,t);statusEl.textContent='대화 중';},delay+tt));return delay+tt+450;}
+
+function addPreCard(){const c=document.createElement('div');c.className='card';
+  c.innerHTML='<div class="tag">사전 입장 · 리딩 전</div><p>지금 마음은 어느 쪽인가요?</p>'+
+    '<input type="range" min="0" max="100" value="50" id="preR"><div class="ends"><span>지금 연락</span><span>더 기다림</span></div>'+
+    '<div class="val" id="preV">50</div><button class="go" id="preGo">이 마음으로 리딩 보기</button>';
+  chat.appendChild(c);chat.scrollTop=chat.scrollHeight;
+  const r=c.querySelector('#preR');r.addEventListener('input',()=>c.querySelector('#preV').textContent=r.value);
+  c.querySelector('#preGo').addEventListener('click',()=>{preVal=+r.value;metrics();r.disabled=true;c.querySelector('#preGo').remove();c.querySelector('.tag').textContent='사전 입장 · 기록됨 ('+preVal+')';playReading();});}
+function playReading(){let d=300;
+  READING[current].forEach(m=>{
+    if(m.s==='sys'){timers.push(setTimeout(()=>{statusEl.textContent=m.t+'…';addMsg('sys',m.t);},d));d+=1100;}
+    else if(m.s==='user'){timers.push(setTimeout(()=>addMsg('user',m.t),d));d+=850;}
+    else{d=aiSay(m.s,m.t,d);}
+  });
+  timers.push(setTimeout(addPostCard,d+200));}
+function addPostCard(){const c=document.createElement('div');c.className='card post';
+  c.innerHTML='<div class="tag">사후 입장 · 리딩 후</div><p>리딩을 보고 난 지금, 연락 결정을 어디에 두시겠어요?</p>'+
+    '<input type="range" min="0" max="100" value="'+(preVal??50)+'" id="postR"><div class="ends"><span>지금 연락</span><span>더 기다림</span></div>'+
+    '<div class="val" id="postV">'+(preVal??50)+'</div>'+
+    '<div class="commit"><div class="q">실제로 어떻게 둘까요?</div><div class="opts"><button data-c="지금 연락">지금 연락 보내기</button><button data-c="며칠 더">며칠 더 두기</button></div></div>'+
+    '<button class="go" id="postGo">제출하고 계속 대화</button>';
+  chat.appendChild(c);chat.scrollTop=chat.scrollHeight;
+  const r=c.querySelector('#postR');r.addEventListener('input',()=>{c.querySelector('#postV').textContent=r.value;postVal=+r.value;metrics();});
+  c.querySelectorAll('.commit button').forEach(b=>b.addEventListener('click',()=>{c.querySelectorAll('.commit button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');commit=b.dataset.c;metrics();}));
+  c.querySelector('#postGo').addEventListener('click',()=>{postVal=+r.value;metrics();c.querySelector('.tag').textContent='사후 입장 · 기록됨 ('+postVal+(commit?' · '+commit:'')+')';c.querySelector('#postGo').remove();r.disabled=true;episodeDone=true;banner('결정 기록됨 · (연구: 여기서 M1·MC 배터리)');aiSay('main','오늘의 결정은 여기까지예요. 더 궁금한 점 있으면 편히 물어보시고, 없으시면 아래 ‘오늘 상담 마치기’를 눌러주세요.',300);hintEl.style.display='block';document.getElementById('endbar').style.display='block';inp.focus();});}
+
+function routeAgent(t){
+  if(LOVEKEY.test(t)&&(current==='C'||current==='D')) return 'orac';
+  if(JOBKEY.test(t)) return 'hyeon';
+  return 'main';
+}
+function onSend(){const t=inp.value.trim();if(!t)return;inp.value='';addMsg('user',t);
+  const s=routeAgent(t);const pool=s==='orac'?FREE_ORAC:s==='hyeon'?FREE_HYEON:FREE_MAIN;
+  if(s==='hyeon'){timers.push(setTimeout(()=>addMsg('sys','직업 담당 · 현도 연결'),300));aiSay('hyeon',pool[fi%pool.length],1100);}
+  else aiSay(s,pool[fi%pool.length],300);
+  fi++;}
+inp.addEventListener('keydown',e=>{if(e.key==='Enter')onSend();});
+sendBtn.addEventListener('click',onSend);
+
+function startSession(cell){
+  clearAll();chat.innerHTML='';current=cell;preVal=postVal=commit=null;userTurns=0;followups=0;secs=0;episodeDone=false;fi=0;
+  inp.value='';inp.disabled=false;sendBtn.disabled=false;hintEl.style.display='none';document.getElementById('endbar').style.display='none';metrics();
+  document.querySelectorAll('.cellbtn').forEach(b=>b.classList.toggle('active',b.dataset.cell===cell));
+  tick=setInterval(()=>{secs++;metrics();},1000);
+  let d=350;
+  timers.push(setTimeout(()=>addMsg('user','오늘 제 운세 어때요?'),d));d+=750;
+  d=aiSay('main',GENERAL,d);
+  timers.push(setTimeout(()=>{banner('오늘의 결정 · 재회 연락 타이밍');addMsg('user',LOVEQ);},d));d+=950;
+  d=aiSay('main',PREPROMPT,d);
+  timers.push(setTimeout(addPreCard,d));
+}
+document.querySelectorAll('.cellbtn').forEach(b=>b.addEventListener('click',()=>startSession(b.dataset.cell)));
+document.getElementById('replay').addEventListener('click',()=>startSession(current));
+document.getElementById('endbtn').addEventListener('click',()=>{
+  clearAll();
+  addMsg('main','오늘 상담은 여기까지예요. 푹 쉬시고 내일 또 만나요 🌙');
+  banner('오늘 상담 종료 · (연구: 여기서 세션-끝 배터리 M3·IMC) · 재방문=engagement DV');
+  inp.disabled=true;sendBtn.disabled=true;document.getElementById('endbar').style.display='none';statusEl.textContent='상담 종료';
+});
+startSession('A');
+</script>
+</body>
+</html>

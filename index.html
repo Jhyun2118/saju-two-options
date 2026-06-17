@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>사주 LLM 플랫폼 · 연구 옵션 2개</title>
+<style>
+  *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;}
+  body{margin:0;background:#f6f7fb;color:#1d2333;min-height:100vh;padding:24px 26px 50px;}
+  .wrap{max-width:1180px;margin:0 auto;}
+  h1{font-size:22px;margin:0 0 4px;color:#15192a;}
+  .subtitle{font-size:13.5px;color:#5d6680;margin:0 0 18px;}
+
+  /* tabs */
+  .tabs{display:flex;gap:8px;margin-bottom:0;}
+  .tab{flex:1;border:1px solid #d9dde9;border-bottom:none;background:#eceef5;color:#5d6680;
+       border-radius:12px 12px 0 0;padding:14px 18px;cursor:pointer;font-size:15px;font-weight:700;line-height:1.35;text-align:left;transition:.15s;}
+  .tab small{display:block;font-size:11.5px;font-weight:500;color:#8a91a6;margin-top:2px;}
+  .tab:hover{background:#e4e7f1;}
+  .tab.active{background:#fff;color:#161b2c;border-color:#cfd5e6;position:relative;top:1px;}
+  .tab1.active{box-shadow:inset 0 4px 0 #d8a93a;}
+  .tab2.active{box-shadow:inset 0 4px 0 #3a5bd0;}
+
+  .panel{display:none;background:#fff;border:1px solid #cfd5e6;border-radius:0 0 16px 16px;padding:22px;box-shadow:0 6px 22px rgba(30,40,80,.06);}
+  .panel.active{display:block;}
+
+  /* SI band (옵션2 상단) */
+  .siband{background:#eef3ff;border:1px solid #cfdcff;border-left:5px solid #3a5bd0;border-radius:12px;padding:14px 18px;margin-bottom:18px;}
+  .siband .lab{font-size:11px;font-weight:700;color:#3a5bd0;letter-spacing:.4px;}
+  .siband h2{font-size:16px;margin:3px 0 7px;color:#1b2440;}
+  .siband p{font-size:13.5px;line-height:1.65;color:#39435f;margin:0 0 8px;}
+  .siband p b{color:#1b2440;}.siband em{font-style:italic;color:#5a6680;}
+  .siband a{font-size:13.5px;color:#2647c4;font-weight:600;word-break:break-all;text-decoration:none;}
+  .siband a:hover{text-decoration:underline;}
+
+  /* per-topic split layout */
+  .split{display:flex;gap:24px;align-items:flex-start;}
+  .left{flex:1;min-width:0;}
+  .right{width:470px;flex-shrink:0;}
+  @media(max-width:1000px){.split{flex-direction:column;}.right{width:100%;max-width:470px;}}
+
+  .ttl{font-size:20px;font-weight:800;margin:0 0 8px;line-height:1.35;color:#161b2c;}
+  .one{font-size:14.5px;color:#3d4661;line-height:1.7;margin:0 0 18px;}
+  .one b{color:#161b2c;}
+
+  .block{margin-bottom:18px;}
+  .block.matrix{margin-top:10px;padding-top:20px;border-top:1px solid #eceef5;}
+  .gap{height:14px;}
+  .block .h{font-size:11.5px;font-weight:700;color:#8a91a6;letter-spacing:.5px;margin-bottom:6px;}
+  .theory{font-size:14px;line-height:1.7;color:#222a40;background:#f7f8fc;border:1px solid #e7eaf2;border-radius:10px;padding:12px 15px;}
+  .theory b{color:#161b2c;}
+  .theory .src{color:#7b8398;font-size:12.5px;}
+  .rqdv{display:grid;grid-template-columns:50px 1fr;gap:9px 12px;font-size:13.5px;line-height:1.6;}
+  .rqdv .k{color:#9097ad;font-weight:700;}
+  .rqdv .v{color:#2a3148;}.rqdv .v b{color:#161b2c;}
+
+  /* 2x2 matrix (roomy) */
+  .mxcap{font-size:13.5px;font-weight:700;color:#3a435f;margin-bottom:9px;}
+  .mxcap em{font-style:normal;color:#8a91a6;font-weight:500;}
+  .grid{display:grid;grid-template-columns:92px 1fr 1fr;gap:9px;}
+  .gc{font-size:13px;text-align:center;font-weight:700;color:#55607a;padding:6px 4px;align-self:center;}
+  .gc small{display:block;font-weight:400;color:#8a91a6;font-size:11px;margin-top:2px;}
+  .gr{font-size:13px;font-weight:700;color:#55607a;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4px;}
+  .gr small{display:block;font-weight:400;color:#8a91a6;font-size:11px;margin-top:2px;}
+  .cell{border:1px solid #e3e6ef;border-radius:10px;padding:11px 12px;font-size:13px;line-height:1.5;background:#fbfcfe;min-height:64px;}
+  .cell .tag{font-weight:700;font-size:12px;display:block;margin-bottom:3px;}
+  .cell.focal{border-width:2px;}
+  .tab1panel .cell.bad{border-color:#e0a3a3;background:#fdf1f1;}.tab1panel .cell.bad .tag{color:#c0392b;}
+  .tab1panel .cell.good{border-color:#9ccdab;background:#f0faf3;}.tab1panel .cell.good .tag{color:#1f8a4c;}
+  .tab2panel .cell.key{border-color:#7c9cff;background:#eef2ff;}.tab2panel .cell.key .tag{color:#3147b0;}
+  .corner{font-size:11.5px;color:#aeb4c6;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.3;}
+  .modnote{font-size:13px;color:#5d6680;margin-top:11px;line-height:1.6;}
+  .tab1panel .modnote b{color:#9a7415;}.tab2panel .modnote b{color:#3147b0;}
+
+  /* 🔑 왜 중요한가 (theory block) */
+  .why{margin-top:10px;border-radius:10px;padding:11px 14px;font-size:13.5px;line-height:1.7;}
+  .tab2panel .why{background:#eef2ff;border:1px solid #c6d2f7;}
+  .tab1panel .why{background:#fdf6e6;border:1px solid #ecd9a0;}
+  .why .wl{font-weight:700;display:block;margin-bottom:3px;}
+  .tab2panel .why .wl{color:#3147b0;}.tab1panel .why .wl{color:#9a7415;}
+  .why b{color:#161b2c;}
+
+  /* 기여 / 함의 (full-width) */
+  .impact{margin-top:22px;padding-top:20px;border-top:1px solid #eceef5;display:flex;gap:26px;flex-wrap:wrap;}
+  .impact .ic{flex:1;min-width:320px;}
+  .impact .ic > .h{font-size:13px;font-weight:800;letter-spacing:.4px;margin-bottom:9px;}
+  .tab1panel .impact .ic > .h{color:#9a7415;}.tab2panel .impact .ic > .h{color:#3147b0;}
+  .impact ul{margin:0;padding-left:18px;}
+  .impact li{font-size:13.5px;line-height:1.65;color:#2a3148;margin-bottom:8px;}
+  .impact li b{color:#161b2c;}
+  .impact li .sub{color:#7b8398;font-size:12.5px;}
+
+  /* mockup */
+  .mocklabel{font-size:13px;color:#3d4661;margin-bottom:8px;line-height:1.55;}
+  .mocklabel b{color:#161b2c;}
+  .tab1panel .mocklabel b{color:#9a7415;}.tab2panel .mocklabel b{color:#3147b0;}
+  .frame{position:relative;border-radius:16px;overflow:hidden;border:1px solid #d7dbe8;box-shadow:0 8px 26px rgba(30,40,80,.14);background:#0e0b1f;}
+  iframe{width:100%;height:880px;border:0;display:block;}
+
+  /* 라이브 링크 배너 */
+  .livebar{background:#0e7a52;color:#fff;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13.5px;line-height:1.55;}
+  .livebar a{color:#ffe9a8;font-weight:700;text-decoration:underline;word-break:break-all;}
+  .livebar b{color:#fff;}
+  /* 인쇄 전용 패널 제목(탭이 숨겨지므로) */
+  .panel-label{display:none;}
+
+  @media print{
+    @page{ size:A4 landscape; margin:10mm; }
+    *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    body{padding:0;background:#fff;}
+    .wrap{max-width:none;}
+    .livebar{font-size:12px;padding:8px 12px;margin-bottom:10px;}
+    .tabs{display:none;}
+    .panel{display:block !important;border:none;box-shadow:none;border-radius:0;padding:0;}
+    #p2{page-break-before:always;}
+    .panel-label{display:block;font-size:16px;font-weight:800;margin:0 0 10px;padding:6px 0;border-bottom:2px solid #999;}
+    .tab1panel .panel-label{color:#9a7415;border-color:#d8a93a;}
+    .tab2panel .panel-label{color:#3147b0;border-color:#3a5bd0;}
+    /* 가로: 좌 텍스트 / 우 목업(축소해 한 화면에) */
+    .split{display:flex;gap:16px;align-items:flex-start;}
+    .left{flex:1;min-width:0;}
+    .right{width:300px;flex-shrink:0;}
+    .frame{height:640px;overflow:hidden;box-shadow:none;}
+    .frame iframe{width:470px;height:1050px;transform:scale(0.6);transform-origin:top left;}
+    .impact{page-break-inside:avoid;page-break-before:always;}
+    .siband{page-break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>사주 LLM 플랫폼(MysticDay) · 연구 옵션 2개</h1>
+  <p class="subtitle">같은 플랫폼으로 두 갈래의 연구. 탭을 눌러 각 주제를 보세요. 각 탭 맨 아래에 <b>실제로 움직이는 목업</b>이 있습니다.</p>
+  <div class="livebar">▶ <b>이 자료는 화면이 실제로 움직입니다.</b> 클릭해서 직접 조건을 바꿔보실 수 있어요. 인터랙티브 데모: <a href="https://jhyun2118.github.io/saju-two-options/">https://jhyun2118.github.io/saju-two-options/</a></div>
+
+  <div class="tabs">
+    <button class="tab tab1 active" onclick="show(1)">옵션 1 · 발화권위 배분<small>일반 IS 연구 · 종단 5일</small></button>
+    <button class="tab tab2" onclick="show(2)">옵션 2 · 단일진리 역설<small>MISQ 특별호 맞춤 · 횡단 + 관찰</small></button>
+  </div>
+
+  <!-- ===== 옵션 1 ===== -->
+  <div class="panel tab1panel active" id="p1">
+    <div class="panel-label">옵션 1 · 발화권위 배분 (일반 IS 연구 · 종단 5일)</div>
+    <div class="split">
+      <div class="left">
+        <p class="ttl">AI가 "이건 제 전문이 아니에요"라며 다른 전문가에게 넘길 때</p>
+        <p class="one">요즘 AI 서비스는 여러 'AI 에이전트'가 서로 일을 넘기며(handoff) 협업하는 <b>agentic 오케스트레이션</b> 방식으로 빠르게 바뀌고 있다. 이때 AI가 자기 권한을 솔직히 인정하고 적임자에게 넘기는지, 아니면 자격 없이 떠안는지가 사용자 신뢰를 가른다.</p>
+
+        <div class="block">
+          <div class="h">선행연구와 빈틈</div>
+          <div class="theory">기존 연구는 AI를 <b>'하나의 조언자'</b>로 보고 사람들이 그 조언을 따르는지에 집중해 왔다. 그러나 여러 에이전트가 권한을 주고받는 <b>agentic 오케스트레이션은 산업에서 막 퍼지는데도 아직 거의 연구되지 않았다.</b> 특히 'AI가 권한을 넘기거나 인정하는 행위'가 신뢰를 어떻게 바꾸는지는 빈 공간이다.</div>
+        </div>
+        <div class="block">
+          <div class="h">사용 이론</div>
+          <div class="theory"><b>화행이론(Speech Act Theory)</b>: "말에는 그것을 말할 <b>자격</b>이 필요하다"는 언어철학.<br><span class="src">Austin (1962); Searle (1969); Williamson (2000). IS 적용: 언어행위관점 Te'eni (2001, MISQ)</span></div>
+        </div>
+        <div class="block">
+          <div class="rqdv">
+            <span class="k">연구<br>질문</span><span class="v">AI가 권한을 <b>인정·이양</b>하는지에 따라 사용자 신뢰가 어떻게 달라지고, 그 신뢰가 <b>5일에 걸쳐</b> 어떻게 쌓이거나 무너지는가</span>
+            <span class="k">무엇을<br>보나</span><span class="v">사용자가 AI 조언을 <b>얼마나 따르는지</b>, 얼마나 오래 대화하는지, <b>다음 날 다시 찾아오는지</b> (모두 실제 대화 기록으로 측정)</span>
+          </div>
+        </div>
+
+        <div class="block matrix">
+          <div class="mxcap">2×2 설계 <em>· '내 전문이다/아니다' × '내가 답한다/넘긴다'</em></div>
+          <div class="grid">
+            <div class="corner">자격 →<br>핸드오프 ↓</div>
+            <div class="gc">보류<small>"제 영역이에요"</small></div>
+            <div class="gc">인정<small>"제 영역 아니에요"</small></div>
+
+            <div class="gr">잔류<small>한결이 그대로</small></div>
+            <div class="cell"><span class="tag">A · 기준</span>내가 맡아 직접 답함</div>
+            <div class="cell bad focal"><span class="tag">B · 떠안음 ⚠</span>"내 영역 아닌데" 내가 답 = <b>주인 없는 조언</b> → 신뢰 침식</div>
+
+            <div class="gr">핸드오프<small>오라클에게</small></div>
+            <div class="cell"><span class="tag">C · 함께</span>내 영역이지만 전문가도 동석</div>
+            <div class="cell good focal"><span class="tag">D · 이양 ✓</span>적임자에게 넘김 = <b>권위 복구</b> → 신뢰 적립</div>
+          </div>
+          <div class="modnote">핵심 대비 = <b>B(떠안음) vs D(이양)</b>. 5일에 걸쳐 침식 vs 적립의 궤적을 본다.</div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="block">
+          <div class="h">움직이는 목업</div>
+          <p class="mocklabel">셀 버튼 <b>A·B·C·D</b>를 눌러 4조건을 비교해 보세요. (시나리오 = Day 3 자유대화)</p>
+          <div class="frame"><iframe src="o2_mockup.html" title="O2 발화권위 배분 목업" loading="lazy"></iframe></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="impact">
+      <div class="ic">
+        <div class="h">기여 · 새로 내놓는 것</div>
+        <ul>
+          <li><b>미개척 영역에 첫 증거</b>: 여러 AI가 일을 주고받는 <b>agentic 오케스트레이션</b>은 산업에서 막 퍼지는데도 연구가 거의 없다. 그 신뢰 동학에 대한 첫 인과·종단 증거.</li>
+          <li><b>새 관점</b>: AI 신뢰를 '권한을 인정·이양하는 행위의 <b>이력</b>'으로 본다. 권위는 고정된 게 아니라 시간에 걸쳐 쌓이거나 무너진다.</li>
+          <li><b>이론 접목</b>: 언어철학의 '말할 자격'(화행이론)을 인간–AI 신뢰에 처음 적용.</li>
+        </ul>
+      </div>
+      <div class="ic">
+        <div class="h">함의 · 누구에게 무엇을</div>
+        <ul>
+          <li><b>이론</b>: 알고리즘 신뢰 연구를 '하나의 조언자'에서 <b>'권한을 주고받는 여러 에이전트'</b>로 확장.</li>
+          <li><b>제품·설계</b>: AI가 한계를 솔직히 인정하고 적임자에게 넘기는 설계가 장기 신뢰를 쌓는다(떠안기는 역효과). ChatGPT·Claude·Agentforce 같은 멀티에이전트 <b>핸드오프 설계 원칙</b>.</li>
+          <li><b>정책</b>: 권한 배분이 사용자 신뢰·의존에 미치는 영향 = AI <b>책임 소재</b> 논의에 근거.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 옵션 2 ===== -->
+  <div class="panel tab2panel" id="p2">
+    <div class="panel-label">옵션 2 · 단일진리의 역설 (MISQ 특별호 맞춤 · 횡단 + 관찰)</div>
+    <div class="siband">
+      <span class="lab">이 옵션이 정조준하는 학술 특별호 (처음 보셔도 OK)</span>
+      <h2>MIS Quarterly 특별호: Indigenous Theory Development</h2>
+      <p><b>MIS Quarterly</b>는 정보시스템(IS) 분야 최상위 저널입니다. 이 특별호는 서구 이론을 그대로 <em>적용·검증</em>하는 연구가 아니라, <b>특정 문화·맥락에서 자라난 새로운 이론을 생성</b>하는 연구를 모집합니다. 사주처럼 한국 고유의 맥락이 약점이 아니라 <b>이론의 자산</b>이 됩니다. (확장초록 마감 2027-02-01)</p>
+      <a href="https://misq.umn.edu/pages/call_for_papers_indigenous_theory_development" target="_blank">🔗 https://misq.umn.edu/pages/call_for_papers_indigenous_theory_development</a>
+    </div>
+
+    <div class="split">
+      <div class="left">
+        <p class="ttl">운명은 하나인데, 다시 생성할 때마다 다른 운명: 단일진리의 역설</p>
+        <p class="one">"내 운명은 하나"라고 믿는 사람이 마음에 안 드는 사주 풀이를 비용 없이 <b>답변 재생성으로 다시 보면</b>, 하나의 진짜 운명을 찾으려는 행동이 오히려 여러 개의 다른 운명을 만들어낸다. 이 모순이 사용자에게 <b>'내 운명이 흔들린다'는 위협감</b>을 준다.</p>
+
+        <div class="block">
+          <div class="h">선행연구와 빈틈</div>
+          <div class="theory">AI 점술·사주 앱 연구가 최근 나오기 시작했지만(타로·중국 점술 등), 대부분 점술을 <b>'여러 해석이 다 가능한 열린 것'</b>으로 본다. 또 '원하는 답 나올 때까지 고르기'는 어디서나 보이는 일반적 확증편향이다. <b>빈 공간은</b>: '운명은 하나'라 믿는 사람에게는 AI의 여러 갈래 풀이가 오히려 <b>위협</b>이 되고, '답변 재생성'이 역설을 일으킨다는 점. 이를 다룬 연구가 없다.</div>
+        </div>
+        <div class="block">
+          <div class="h">이 연구가 새로 제안하는 것</div>
+          <div class="theory">사주에서 운명은 <b>'만세력'이라는 하나의 고정된 표</b>에 적혀 있다. <em>'내 운명은 하나'</em>라는 믿음이 <b>문화적으로 굳어 있다.</b> 그런데 AI 사주는 같은 사람에게 <b>답변을 생성할 때마다 다른 운명</b>을 내놓는다. 운명이 하나라 믿는 이에겐 단순한 불편이 아니라 <b>진실 자체가 흔들리는 위협</b>이다. 사용자는 한 풀이를 '진짜'로 정하거나 멈추지만, <b>하나를 찾으려 다시 생성할수록 운명이 더 갈라지는 역설</b>에 빠진다.</div>
+          <div class="why"><span class="wl">🔑 왜 중요한가</span>기존 정보·조언 연구는 <em>'여러 답이 함께 있는 게 낫고, 갈라지면 통합하거나 평균 내면 된다'</em>고 암묵적으로 전제해 왔다. <b>복수의 답이 곧 위협인 사용자를 상상한 적이 없다.</b> 이 토착 이론은 바로 그런 사용자(운명이 하나라 믿는)를 드러내고, <b>그 결과</b> 보편 통념의 숨은 전제를 들춘다.</div>
+          <div class="theory" style="margin-top:8px;"><span class="src">이 위협이 <b>왜</b> 생기는지는 화행이론(Speech Act Theory; Austin 1962, Searle 1969)이 거든다. 사주 풀이를 '참이냐 거짓이냐'를 가리는 말로 받아들이기에, 갈라지면 거짓처럼 느낀다.</span></div>
+        </div>
+        <div class="block">
+          <div class="rqdv">
+            <span class="k">연구<br>질문</span><span class="v">'운명은 하나'라는 믿음이 강한 사람일수록, AI가 내놓는 <b>여러 갈래 풀이가 위협</b>이 되어 답변을 다시 생성하거나 한 풀이에 매달리게 만드는가</span>
+            <span class="k">무엇을<br>보나</span><span class="v">① 사용자가 느끼는 <b>'내 운명이 흔들린다'는 위협감</b> <span class="src">(이 연구의 새 개념 = 운명-흔들림 위협, 영문 Truth-Violation Threat)</span> ② 마음에 들 때까지 <b>답변을 다시 생성하는 행동</b> ③ 결국 <b>듣기 좋은 풀이에서 멈추는지</b> ④ 장기적으로 실제 앱 기록과 믿음 변화</span>
+          </div>
+        </div>
+
+        <div class="block matrix">
+          <div class="mxcap">2×2 설계 <em>· 첫 풀이가 '좋은지/나쁜지' × 말투가 '단정적인지/여러 갈래인지'</em></div>
+          <div class="grid">
+            <div class="corner">첫 풀이 →<br>말투 ↓</div>
+            <div class="gc">나쁜 운<small>안 좋은 풀이</small></div>
+            <div class="gc">좋은 운<small>좋은 풀이</small></div>
+
+            <div class="gr">단정적 말투<small>"길은 하나"</small></div>
+            <div class="cell">나쁘다고 단정적으로 → 답변을 다시 생성하고 싶음</div>
+            <div class="cell">좋다고 단정적으로 → 만족·수용</div>
+
+            <div class="gr">여러 갈래<small>"이럴 수도<br>저럴 수도"</small></div>
+            <div class="cell key focal"><span class="tag">★ 위협</span>여러 갈래 + 나쁜 운 → 위협감↑</div>
+            <div class="cell key focal"><span class="tag">★ 위협</span>좋아도 '여러 갈래'면 운명 하나 믿는 이엔 위협</div>
+          </div>
+          <div class="modnote">여기에 더해, 사람마다 다른 <b>'운명은 하나'라는 믿음의 강도</b>를 함께 잰다. 위협감은 이 믿음이 강한 사람에게서만 나타날 것으로 보며, 이 점이 단순한 '원하는 답 고르기(확증편향)'와 구별되는 핵심이다.</div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="block">
+          <div class="h">움직이는 목업</div>
+          <p class="mocklabel"><b>첫 풀이·말투</b> 버튼 + <b>🔄 답변 재생성</b>을 눌러 '위협감' 막대가 오르는 걸 보세요.</p>
+          <div class="frame"><iframe src="tvt_mockup.html" title="단일진리 역설 목업" loading="lazy"></iframe></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="impact">
+      <div class="ic">
+        <div class="h">기여 · 새로 내놓는 것</div>
+        <ul>
+          <li><b>새 개념</b>: <b>운명-흔들림 위협</b>(영문 Truth-Violation Threat). '짜증·불만'이 아니라 '진실이 흔들리는' 위협으로, 기존 개념과 구별되는 새 구성개념.</li>
+          <li><b>새 이론(이론화)</b>: '운명은 하나' 믿음 → 위협 → 한 풀이에 정박 → <b>찾을수록 갈라지는 자기-패배 역설</b>이라는 과정 이론을 사주 맥락에서 생성.</li>
+          <li><b>새 현상</b>: 무비용 답변 재생성이 만드는 <b>'디지털 점집 돌기'</b>를 처음 명명·인과로 규명.</li>
+        </ul>
+      </div>
+      <div class="ic">
+        <div class="h">함의 · 누구에게 무엇을</div>
+        <ul>
+          <li><b>이론(되받아 말하기)</b>: 조언·AI신뢰 연구의 <b>숨은 다원주의 전제</b>를 폭로. '참 진단은 하나'라 믿는 환자, 단일정답 법해석, 종교 등 <b>단일진리 영역</b>으로 일반화.</li>
+          <li><b>제품·설계</b>: 무피드백 자문에서 <b>답변 재생성 버튼은 중립이 아니다.</b> 믿음을 침식하고 자기-패배 루프를 만든다. 단일진리 사용자용 <b>'정박' 설계</b> 필요.</li>
+          <li><b>정책·윤리</b>: 사실 오류가 전혀 없어도 <b>출력이 갈리는 것만으로</b> 사용자의 의미체계를 흔드는 <b>'비정확성 해악'</b>. AI 거버넌스가 '틀린 정보'를 넘어 봐야 할 지점.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function show(n){
+    document.getElementById('p1').classList.toggle('active', n===1);
+    document.getElementById('p2').classList.toggle('active', n===2);
+    document.querySelector('.tab1').classList.toggle('active', n===1);
+    document.querySelector('.tab2').classList.toggle('active', n===2);
+  }
+</script>
+</body>
+</html>

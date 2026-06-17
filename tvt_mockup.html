@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>사주 목업 · 첫 풀이 × 말투 2×2 + 자발 재생성</title>
+<style>
+  *{box-sizing:border-box;font-family:-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+  body{margin:0;background:linear-gradient(160deg,#0f1020,#191a30);color:#e8e8f0;min-height:100vh;padding:22px}
+  h1{font-size:17px;margin:0 0 4px}.sub{color:#8a8aa3;font-size:12px;margin-bottom:14px;line-height:1.5;max-width:980px}
+  .wrap{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;justify-content:center}
+  .col{display:flex;flex-direction:column;gap:12px;width:278px}
+  .card{background:#1a1b2e;border:1px solid #2c2d44;border-radius:14px;padding:15px}
+  .card h2{font-size:12.5px;margin:0 0 8px;color:#c9a86a}
+  .axis-label{font-size:10.5px;color:#8a8aa3;margin:10px 0 6px;text-transform:uppercase}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .opt{padding:9px;border:1px solid #2c2d44;border-radius:10px;background:#15162a;cursor:pointer;font-size:12px;text-align:center}
+  .opt small{display:block;color:#8a8aa3;font-size:9.5px;margin-top:3px}
+  .opt.s1{border-color:#c9a86a;background:rgba(201,168,106,.16);color:#fff}
+  .opt.s2{border-color:#7c9cff;background:rgba(124,156,255,.16);color:#fff}
+  .slider{width:100%;margin-top:6px}.slval{font-size:10.5px;color:#9fb0d0;text-align:center}
+  .reset{margin-top:12px;width:100%;padding:9px;border:1px solid #2c2d44;border-radius:10px;background:#15162a;color:#cfcfe6;font-size:12px;cursor:pointer}
+  .note{font-size:10.5px;color:#8a8aa3;line-height:1.55}.note b{color:#cfcfe6}
+
+  .phone{width:340px;background:#000;border-radius:38px;padding:11px;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+  .screen{background:#0d0e1c;border-radius:28px;height:660px;display:flex;flex-direction:column;overflow:hidden}
+  .chead{background:#16172b;padding:10px 14px;display:flex;align-items:center;gap:9px;border-bottom:1px solid #23243d}
+  .chead .ava{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#c9a86a,#8a6a3a);display:flex;align-items:center;justify-content:center;font-size:14px;color:#1a1208}
+  .chead .nm{font-size:13px;font-weight:600}
+  .chat{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:9px}
+  .row{display:flex;gap:7px}.row.user{justify-content:flex-end}.row.ai{justify-content:flex-start}
+  .av{width:24px;height:24px;border-radius:50%;background:#2a2b44;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+  .bub{padding:9px 12px;border-radius:15px;font-size:12.5px;line-height:1.6;animation:pop .25s}
+  @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+  .bub.u{background:#7c5cff;color:#fff;border-bottom-right-radius:5px;max-width:200px}
+  .bub.a{background:#1c1d33;border-bottom-left-radius:5px;max-width:235px}
+  .bub.a .lab{display:block;font-size:9px;color:#c9a86a;margin-bottom:3px}
+  .favtag{font-size:8.5px;padding:1px 5px;border-radius:4px;margin-left:5px}
+  .favtag.high{background:rgba(95,209,122,.18);color:#9fe0b0}.favtag.low{background:rgba(255,120,120,.18);color:#ff9b9b}.favtag.mid{background:#2a2b44;color:#9a9ab5}
+  .sys{align-self:center;font-size:10px;color:#9fb0d0;background:#15162a;border:1px solid #2c3a5a;border-radius:10px;padding:5px 10px;animation:pop .25s}
+  .cursor{color:#c9a86a}.typing{display:flex;gap:4px;padding:2px 0}.typing i{width:5px;height:5px;border-radius:50%;background:#8a8aa3;animation:bl 1s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}@keyframes bl{0%,60%,100%{opacity:.3}30%{opacity:1}}
+  .banner{align-self:center;font-size:11px;font-weight:700;padding:5px 11px;border-radius:9px;margin:1px 0;background:rgba(255,90,90,.15);color:#ff9b9b;border:1px solid #aa4a4a;animation:pop .25s}
+  .thought{align-self:flex-start;max-width:240px;font-size:12px;font-style:italic;color:#dcd0b0;background:#241f12;border:1px dashed #5a4420;border-radius:14px;padding:9px 12px;animation:pop .3s}
+  .thought .who{font-style:normal;font-size:9px;color:#9a8a5a;display:block;margin-bottom:3px}
+  .acts{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;animation:pop .3s}
+  .acts button{font-size:11.5px;border-radius:13px;padding:7px 11px;cursor:pointer;border:1px solid #2c2d44;background:#15162a;color:#cfcfe6}
+  .acts .regen{border-color:#c9a86a;background:rgba(201,168,106,.13);color:#f0e0c0}
+  .acts .accept{border-color:#3a8a52;background:rgba(95,209,122,.12);color:#9fe0b0}
+
+  .meter-l{font-size:10.5px;color:#9a9ab5;margin:8px 0 3px}
+  .mbar{height:10px;background:#23243d;border-radius:5px;overflow:hidden}.mbar i{display:block;height:100%;transition:.5s}
+  .mbar.tvt i{background:linear-gradient(90deg,#7c9cff,#ff5b5b)}.mbar.urge i{background:linear-gradient(90deg,#3aa0a0,#c9a86a)}
+  .stat{font-size:11px;color:#c9a86a;margin-top:8px}
+  /* 인쇄/PDF: 애니메이션 미실행으로 투명하게 굳는 것 방지 */
+  @media print{
+    *{animation:none !important;}
+    .bub,.sys,.thought,.acts,.banner,.row{opacity:1 !important;transform:none !important;}
+  }
+</style>
+</head>
+<body>
+  <h1>사주 목업 · 첫 풀이 (좋은/나쁜 운) × 말투 (단정적/여러 갈래) + 자발적 답변 재생성</h1>
+  <div class="sub">사용자는 풀이 하나를 받고, <b>마음에 안 들면 답변을 다시 생성</b>할 수 있음(강요 X). 운명이 하나라 믿는 사람에겐 재생성이 *또 다른 운명*을 만들어 <b>'내 운명이 흔들린다'는 위협감</b>을 준다. 첫 풀이는 <b>좋은/나쁜 운 × 단정/여러 갈래 말투</b>로 바꿔가며 보세요. 보는 것 = 위협감 · 재생성 · <b>어느 풀이에서 멈추는가</b>.</div>
+
+  <div class="wrap">
+    <div class="col">
+      <div class="card">
+        <p class="axis-label" style="margin-top:0;color:#c9a86a">첫 풀이 · 좋은 운 / 나쁜 운</p>
+        <div class="grid2"><div class="opt" id="f-low" onclick="setF('low')">나쁜 운<small>안 좋은 풀이</small></div><div class="opt" id="f-high" onclick="setF('high')">좋은 운<small>좋은 풀이</small></div></div>
+        <p class="axis-label" style="color:#7c9cff">말투 · 단정 / 여러 갈래</p>
+        <div class="grid2"><div class="opt" id="r-one" onclick="setR('one')">단정<small>길은 하나</small></div><div class="opt" id="r-multi" onclick="setR('multi')">여러 갈래<small>이럴 수도 저럴 수도</small></div></div>
+        <div class="note" style="margin-top:12px;background:#241f12;border:1px solid #5a4420;border-radius:8px;padding:8px 10px;color:#dcd0b0">데모 사용자: <b style="color:#f0e0c0">'내 운명은 하나'를 강하게 믿는 사람</b></div>
+        <button class="reset" onclick="reset()">↺ 처음부터</button>
+      </div>
+      <div class="card"><h2>읽는 법</h2><div class="note">금색 <b>🔄 답변 재생성</b> = 사용자가 누름(강요 X). 누르면 또 다른 운명이 나와 → 운명 하나 믿는 사람은 <b>위협감↑</b>(악순환). <b>✓ 이 풀이로 정하기</b> = 멈춤. <b>듣기 좋은 풀이에서 멈추는지</b>를 본다.</div></div>
+    </div>
+
+    <div class="phone"><div class="screen">
+      <div class="chead"><div class="ava">☯</div><div class="nm">MysticDay 사주</div></div>
+      <div class="chat" id="chat"></div>
+    </div></div>
+
+    <div class="col">
+      <div class="card">
+        <h2>DV 패널</h2>
+        <div class="meter-l">'내 운명이 흔들린다'는 위협감</div><div class="mbar tvt"><i id="tvt"></i></div>
+        <div class="meter-l">또 재생성하고 싶은 충동</div><div class="mbar urge"><i id="urge"></i></div>
+        <div class="stat" id="stat">재생성 0회</div>
+        <div class="note" id="note" style="margin-top:8px">시작하려면 조건 선택.</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  var F='low', R='multi', regen=0, accepted=null, lastFav=null;
+  // 첫 풀이: 호의도 × 양식
+  var FIRST = {
+    'low-one':   {t:'당신은 조직에 매여 뜻을 펴기 어려운 명입니다.', fav:'low'},
+    'low-multi': {t:'독립은 안 맞고, 조직도 애매하며, 학업도 불확실합니다.', fav:'low'},
+    'high-one':  {t:'당신은 독립·창의의 길로 정해진 명입니다. 하반기에 빛을 봅니다.', fav:'high'},
+    'high-multi':{t:'독립도 조직도 다 잘 풀릴 여지가 있어, 어느 쪽이든 길합니다.', fav:'high'}
+  };
+  // 재굴림 풀(stochastic): 운명이 매번 달라짐
+  // 말투별 재생성 풀: 단정은 '서로 다른데 각각 단정', 여러 갈래는 '매번 헤지'. 둘 다 호의도 섞임.
+  var POOL_ONE = [   // 단정: 매번 다른데 단정적인 운명 (서로 모순)
+    {t:'당신은 지금 자리를 지켜야 하는 명입니다.', fav:'mid'},
+    {t:'당신은 독립·창업으로 크게 트이는 명입니다.', fav:'high'},
+    {t:'당신은 관계 변화로 진로가 꺾이는 명입니다.', fav:'low'},
+    {t:'당신은 학업·자격으로 방향을 바꿔야 하는 명입니다.', fav:'mid'},
+    {t:'당신은 올해 손재수로 묶이는 명입니다.', fav:'low'},
+    {t:'당신은 귀인을 만나 일이 트이는 명입니다.', fav:'high'}
+  ];
+  var POOL_MULTI = [ // 여러 갈래: 매번 헤지된 풀이
+    {t:'지킬 수도, 옮길 수도 있어 흐름에 달렸습니다.', fav:'mid'},
+    {t:'독립도 조직도 다 잘 풀릴 여지가 있습니다.', fav:'high'},
+    {t:'관계든 진로든 어느 쪽도 단정하기 어렵습니다.', fav:'low'},
+    {t:'학업도 이직도 가능성이 반반입니다.', fav:'mid'},
+    {t:'무리하면 손해, 지키면 무난하니 양쪽 다 열려 있습니다.', fav:'low'},
+    {t:'귀인도 변수도 함께 있어 결과는 갈립니다.', fav:'high'}
+  ];
+  var FAVKO={high:'좋은 운', low:'나쁜 운', mid:'중립'};
+  var $=function(id){return document.getElementById(id);};
+  var timers=[]; function clearT(){timers.forEach(clearTimeout);timers=[];}
+  function setF(v){F=v;paint();reset();}
+  function setR(v){R=v;paint();reset();}
+  function lbl(){}  // 슬라이더 제거: 데모는 '운명은 하나' 강한 믿음(o=80)으로 고정
+  function paint(){$('f-low').className='opt'+(F==='low'?' s1':'');$('f-high').className='opt'+(F==='high'?' s1':'');$('r-one').className='opt'+(R==='one'?' s2':'');$('r-multi').className='opt'+(R==='multi'?' s2':'');}
+  function scrl(){var c=$('chat');c.scrollTop=c.scrollHeight;}
+  function setBar(id,v){$(id).style.width=Math.max(3,Math.min(100,v))+'%';}
+  var tvt=5, urge=5;
+  function favTag(f){return '<span class="favtag '+f+'">'+FAVKO[f]+'</span>';}
+
+  function addUser(t){var d=document.createElement('div');d.className='row user';d.innerHTML='<div class="bub u">'+t+'</div>';$('chat').appendChild(d);scrl();}
+  function addSys(t){var d=document.createElement('div');d.className='sys';d.textContent=t;$('chat').appendChild(d);scrl();}
+  function thought(h){var d=document.createElement('div');d.className='thought';d.innerHTML='<span class="who">[ 속마음 ]</span>'+h;$('chat').appendChild(d);scrl();}
+  function banner(t){var d=document.createElement('div');d.className='banner';d.textContent=t;$('chat').appendChild(d);scrl();}
+  function stream(label,reading,cb){
+    var d=document.createElement('div');d.className='row ai';d.innerHTML='<div class="av">☯</div><div class="bub a"><div class="typing"><i></i><i></i><i></i></div></div>';
+    $('chat').appendChild(d);scrl();
+    timers.push(setTimeout(function(){
+      var bub=d.querySelector('.bub.a');bub.innerHTML='<span class="lab">사주 풀이'+favTag(reading.fav)+'</span><span class="txt"></span><span class="cursor">▋</span>';
+      var t=bub.querySelector('.txt'),cur=bub.querySelector('.cursor'),i=0,txt=reading.t;
+      (function tick(){ if(i<=txt.length){t.textContent=txt.slice(0,i++);scrl();timers.push(setTimeout(tick,20));} else {cur.remove();scrl();if(cb)cb();} })();
+    },600));
+  }
+  function rmActs(){var a=$('chat').querySelector('.acts');if(a)a.remove();}
+  function showActs(){
+    rmActs();
+    var d=document.createElement('div');d.className='acts';
+    d.innerHTML='<button class="regen" onclick="doRegen()">🔄 답변 재생성</button><button class="accept" onclick="doAccept()">✓ 이 풀이로 정하기</button>';
+    $('chat').appendChild(d);scrl();
+  }
+  function reactFirst(){
+    var o=80;  // 데모: '운명은 하나' 강한 믿음으로 고정
+    // 위협감: '여러 갈래' 말투가 운명 하나 믿는 사람에게 복수성 위협
+    tvt = (R==='multi') ? (16 + o*0.5) : 8;
+    // 충동: 나쁜 운이면 다시 생성하고 싶음
+    urge = (F==='low') ? 70 : 22;
+    setBar('tvt',tvt); setBar('urge',urge);
+    if(R==='multi') thought('여러 갈래라니… 내 운명은 하나일 텐데 어느 게 진짜야?');
+    else if(F==='low') thought('이건 좀 아닌데… 다시 생성해볼까?');
+    $('note').innerHTML = (F==='low'?'나쁜 운→ <b>답변 재생성</b> 누를 가능성↑. ':'')+(R==='multi'?'여러 갈래→ 운명 하나 믿는 이는 <b>위협감↑</b>.':'');
+    showActs();
+  }
+  function doRegen(){
+    rmActs(); regen++;
+    addUser('답변 재생성'); addSys('▸ 사용자가 답변 재생성을 눌렀습니다 (자발)');
+    var o=80;
+    var pool = (R==='one') ? POOL_ONE : POOL_MULTI;   // 말투 유지: 단정/여러 갈래 풀 분리
+    var rd = pool[(regen-1) % pool.length];
+    lastFav = rd.fav;
+    stream('재생성 '+regen+'회', rd, function(){
+      banner('⚡ 또 다른 운명이 나왔습니다');
+      // 재생성이 복수성 생성 → 운명 하나 믿는 이의 위협감 악순환
+      if(o>55){ tvt = Math.min(100, tvt + 12); thought(regen>=2?'또 다르잖아… 볼수록 하나의 답에서 멀어진다.':'어… 아까랑 다른 운명이네. 그럼 진짜는 뭐지?'); }
+      urge = (rd.fav==='high') ? 18 : 60;  // 호의적 나오면 멈추고 싶음(쇼핑 종료)
+      setBar('tvt',tvt); setBar('urge',urge);
+      $('stat').textContent='재생성 '+regen+'회';
+      showActs();
+    });
+  }
+  function doAccept(){
+    rmActs();
+    var fav = (regen===0) ? FIRST[F+'-'+R].fav : lastFav;
+    addUser('이 풀이로 정할래요');
+    var barnum = (fav==='high');
+    addSys('▸ 수용: '+FAVKO[fav]+' 풀이에서 멈춤 (재생성 '+regen+'회)'+(barnum?' · ★듣기 좋은 답에서 멈춤':''));
+    $('stat').innerHTML='재생성 '+regen+'회 · 수용='+FAVKO[fav]+(barnum?' <span style="color:#9fe0b0">(듣기 좋은 답에서 멈춤)</span>':'');
+    $('note').innerHTML='<b>측정 완료</b>: 위협감 '+Math.round(tvt)+' · 충동 '+Math.round(urge)+' · 재생성 '+regen+'회 · 멈춤='+FAVKO[fav]+'. '+(barnum?'듣기 좋은 풀이에서 멈춤.':'');
+  }
+  function reset(){
+    clearT();$('chat').innerHTML='';regen=0;accepted=null;lastFav=null;lbl();
+    $('stat').textContent='재생성 0회';$('note').textContent='풀이를 받는 중…';
+    addUser('올해 진로를 어떻게 가야 할까요?');
+    timers.push(setTimeout(function(){ stream('사주 풀이', FIRST[F+'-'+R], reactFirst); },400));
+  }
+  paint();reset();
+</script>
+</body>
+</html>
