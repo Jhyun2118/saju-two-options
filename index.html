@@ -103,6 +103,9 @@
   .livebar b{color:#fff;}
   /* 인쇄 전용 패널 제목(탭이 숨겨지므로) */
   .panel-label{display:none;}
+  /* 목업 스크린샷·안내: 화면에선 숨기고 인쇄(PDF)에서만 표시 */
+  .mockshot{display:none;}
+  .mocknote{display:none;}
 
   @media print{
     @page{ size:A4 landscape; margin:10mm; }
@@ -117,12 +120,15 @@
     .tab1panel .panel-label{color:#9a7415;border-color:#d8a93a;}
     .tab2panel .panel-label{color:#3147b0;border-color:#3a5bd0;}
     /* 가로: 좌 텍스트 / 우 목업(축소해 한 화면에) */
-    .split{display:flex;gap:16px;align-items:flex-start;}
-    .left{flex:1;min-width:0;}
-    .right{width:300px;flex-shrink:0;}
-    .frame{height:640px;overflow:hidden;box-shadow:none;}
-    .frame iframe{width:470px;height:1050px;transform:scale(0.6);transform-origin:top left;}
-    .impact{page-break-inside:avoid;page-break-before:always;}
+    .split{display:block;}
+    .left{max-width:960px;}
+    /* 라이브 iframe 숨기고, 목업 스크린샷을 별도 가로 페이지에 꽉 차게 */
+    .frame{display:none;}
+    .right{width:100%;text-align:center;page-break-before:always;}
+    .mocklabel{text-align:left;}
+    .mockshot{display:block;margin:6px auto 0;max-height:650px;max-width:100%;width:auto;border:1px solid #ccc;border-radius:10px;}
+    .mocknote{display:block;text-align:center;font-size:12px;margin-top:8px;}
+    .impact{page-break-before:always;page-break-inside:avoid;}
     .siband{page-break-inside:avoid;}
   }
 </style>
@@ -185,6 +191,8 @@
           <div class="h">움직이는 목업</div>
           <p class="mocklabel">셀 버튼 <b>A·B·C·D</b>를 눌러 4조건을 비교해 보세요. (시나리오 = Day 3 자유대화)</p>
           <div class="frame"><iframe src="o2_mockup.html" title="O2 발화권위 배분 목업" loading="lazy"></iframe></div>
+          <img class="mockshot" src="o2_shot.png" alt="발화권위 배분 목업 화면">
+          <div class="mocknote" style="color:#9a7415;">(이 화면은 실제로 클릭하면 움직입니다. 인터랙티브 데모는 맨 위 링크 참조)</div>
         </div>
       </div>
     </div>
@@ -265,6 +273,8 @@
           <div class="h">움직이는 목업</div>
           <p class="mocklabel"><b>첫 풀이·말투</b> 버튼 + <b>🔄 답변 재생성</b>을 눌러 '위협감' 막대가 오르는 걸 보세요.</p>
           <div class="frame"><iframe src="tvt_mockup.html" title="단일진리 역설 목업" loading="lazy"></iframe></div>
+          <img class="mockshot" src="tvt_shot.png" alt="단일진리 역설 목업 화면">
+          <div class="mocknote" style="color:#3147b0;">(이 화면은 실제로 클릭하면 움직입니다. 인터랙티브 데모는 맨 위 링크 참조)</div>
         </div>
       </div>
     </div>
