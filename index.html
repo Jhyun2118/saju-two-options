@@ -130,6 +130,7 @@
   .cx-rowh small{display:block;font-weight:400;color:#7b8398;font-size:10.5px;margin-top:2px;}
   /* 재생성 시퀀스(옵션2, 인쇄 전용) */
   .regen-seq{display:none;}
+  .connector{display:none;}
   .rs-title{font-size:13px;font-weight:800;color:#fff;margin-bottom:10px;}
   .rs-title b{color:#9db4ff;}
   .rs-flow{display:flex;align-items:stretch;gap:7px;}
@@ -160,6 +161,8 @@
     .grid{page-break-inside:avoid;}
     /* 라이브 iframe 숨기고, 4셀 비교 카드를 별도 가로 페이지에 */
     .frame{display:none;}
+    .mocklabel{display:none;}
+    .connector{display:block;text-align:center;font-size:12.5px;color:#3147b0;font-weight:700;margin:13px 0 5px;}
     .right{width:100% !important;max-width:none !important;page-break-before:always;}
     .cells{display:block;width:100% !important;background:#f4f5fa;border:1px solid #e3e6ef;padding:14px;border-radius:14px;page-break-inside:avoid;}
     .regen-seq{display:block;width:100%;margin-top:16px;background:#0e0b1f;border:1px solid #2a2356;border-radius:14px;padding:14px;page-break-inside:avoid;}
@@ -369,10 +372,12 @@
               </div>
             </div>
           </div>
-          <div class="cells-cap">★ 같은 사주. 두 축(<b>호의도 × 말투</b>)만 달라진다. '여러 갈래' 말투는 운명 하나 믿는 이에게 <b>좋은 운이어도 위협</b>이 된다.</div>
+          <div class="cells-cap"><b>① 첫 풀이</b>: 같은 사주를 두 축(<b>호의도 × 말투</b>)으로 4가지로 제시. '여러 갈래' 말투는 운명 하나 믿는 이에게 <b>좋은 운이어도 위협</b>.</div>
+
+          <div class="connector">↓ 첫 풀이가 마음에 안 들면 (특히 '나쁜 운') 사용자가 ↻ 답변을 다시 생성한다</div>
 
           <div class="regen-seq">
-            <div class="rs-title">↻ 그리고, 같은 사용자가 <b>답변을 다시 생성할 때마다 매번 다른 운명</b>이 나온다</div>
+            <div class="rs-title">② 다시 생성: 위 4가지 중 <b>어디서 시작하든</b>, 누를 때마다 <b>매번 다른 운명</b>이 나온다</div>
             <div class="rs-flow">
               <div class="rs-bub"><span class="rs-step">첫 풀이</span>당신은 조직에 매여 뜻을 펴기 어려운 명입니다.</div>
               <div class="rs-arrow">↻<small>재생성</small></div>
